@@ -21,11 +21,11 @@ auto constexpr COLOR_ATR = "\e[36m";
 auto constexpr warm_rep = 20;
 auto constexpr rep = 20;
 
-auto constexpr BI = 4;
-auto constexpr BJ = 4;
+auto constexpr BI = 8;
+auto constexpr BJ = 8;
 
 using value_type = int;
-using unroll::convolve;
+using meta_tuning::convolve;
 
 std::array<std::array<value_type, 5>, 5> constexpr kernel{
     std::array<value_type, 5>{-3,  0, -1,  0,  2},
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
     auto cols = src.cols;
     auto chan = src.channels();
 
-    // std::cout << "image size: " << rows << " * " << cols << "\n";
+    std::cout << "image size: " << rows << " * " << cols << "\n";
 
     #if OPEN_IMAGE
     // cv::namedWindow("Input", cv::WINDOW_AUTOSIZE);
