@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
     auto cols = src.cols;
     auto chan = src.channels();
 
-    std::cout << "image size: " << rows << " * " << cols << "\n";
+    // std::cout << "image size: " << rows << " * " << cols << "\n";
 
     #if OPEN_IMAGE
     // cv::namedWindow("Input", cv::WINDOW_AUTOSIZE);
