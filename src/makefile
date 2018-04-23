@@ -8,8 +8,8 @@ CC = clang++
 LD = clang++
 
 # debug flags -D DEBUGGING_ENABLED -g
-CCFLAGS = -fno-operator-names -march=native -std=c++14 -Wall -Wextra -fopenmp -fsanitize=undefined -D DEBUGGING_ENABLED -O3
-LDFLAGS = -fsanitize=undefined -lOpenCL `pkg-config --libs --cflags opencv`
+CCFLAGS = -fcolor-diagnostics -std=c++14 -O3 -Wall -Wextra
+LDFLAGS = -fcolor-diagnostics -lOpenCL `pkg-config --libs --cflags opencv`
 OBJECTS = $(BUILD)/main.o
 BUILD = build
 BIN = $(BUILD)/build
