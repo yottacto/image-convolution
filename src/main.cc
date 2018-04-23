@@ -1,4 +1,4 @@
-// ml:run = time -p $bin ../data/2.jpg
+// ml:run = time -p $bin ../data/0.jpg
 // ml:ccf += -fopenmp
 // ml:ldf += -fopenmp -lOpenCL -I/usr/include/opencv -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_aruco -lopencv_bgsegm -lopencv_bioinspired -lopencv_ccalib -lopencv_dnn_objdetect -lopencv_dpm -lopencv_face -lopencv_photo -lopencv_freetype -lopencv_fuzzy -lopencv_hdf -lopencv_hfs -lopencv_img_hash -lopencv_line_descriptor -lopencv_optflow -lopencv_reg -lopencv_rgbd -lopencv_saliency -lopencv_stereo -lopencv_structured_light -lopencv_phase_unwrapping -lopencv_surface_matching -lopencv_tracking -lopencv_datasets -lopencv_text -lopencv_dnn -lopencv_plot -lopencv_xfeatures2d -lopencv_shape -lopencv_video -lopencv_ml -lopencv_ximgproc -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_flann -lopencv_xobjdetect -lopencv_imgcodecs -lopencv_objdetect -lopencv_xphoto -lopencv_imgproc -lopencv_core
 
@@ -8,6 +8,7 @@
 #include <iterator>
 #include <vector>
 #include <array>
+#include <cassert>
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -21,8 +22,8 @@ auto constexpr COLOR_ATR = "\e[36m";
 auto constexpr warm_rep = 20;
 auto constexpr rep = 20;
 
-auto constexpr BI = 8;
-auto constexpr BJ = 8;
+auto constexpr BI = 4;
+auto constexpr BJ = 4;
 
 using value_type = int;
 using meta_tuning::convolve;
@@ -64,13 +65,15 @@ int main(int argc, char* argv[])
     auto cols = src.cols;
     auto chan = src.channels();
 
+    assert(chan == 3);
+
     // std::cout << "image size: " << rows << " * " << cols << "\n";
 
     #if OPEN_IMAGE
-    // cv::namedWindow("Input", cv::WINDOW_AUTOSIZE);
-    // cv::imshow("Input", src);
-    // while (cv::waitKey(1000) != 27 /* esc */) {
-    // }
+    cv::namedWindow("Input", cv::WINDOW_AUTOSIZE);
+    cv::imshow("Input", src);
+    while (cv::waitKey(1000) != 27 /* esc */) {
+    }
     #endif
 
     std::vector<cv::Mat> channels(chan);
@@ -84,20 +87,27 @@ int main(int argc, char* argv[])
 
     // warm up
     for (auto i = 0; i < warm_rep; i++) {
-        for (auto i = 0u; i < din.size(); i++)
-            convolve<BI, BJ>(rows, cols, din[i], dout[i], kernel, size);
+        // for (auto i = 0u; i < din.size(); i++)
+        convolve<BI, BJ>(rows, cols, din[0], dout[0], kernel, size);
+        convolve<BI, BJ>(rows, cols, din[1], dout[1], kernel, size);
+        convolve<BI, BJ>(rows, cols, din[2], dout[2], kernel, size);
     }
+
 
     {
         auto sum = 0;
         utils::timer t;
         t.start();
         for (auto i = 0; i < rep; i++) {
-            for (auto i = 0u; i < din.size(); i++) {
-                convolve<BI, BJ>(rows, cols, din[i], dout[i], kernel, size);
-                sum += dout[i][400];
-            }
+            // for (auto i = 0u; i < din.size(); i++) {
+            convolve<BI, BJ>(rows, cols, din[0], dout[0], kernel, size);
+            convolve<BI, BJ>(rows, cols, din[1], dout[1], kernel, size);
+            convolve<BI, BJ>(rows, cols, din[2], dout[2], kernel, size);
+            sum += dout[0][400];
+            sum += dout[1][400];
+            sum += dout[2][400];
         }
+
         t.stop();
 
         // std::cout << "Hand-written [average] elapsed time: "

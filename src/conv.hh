@@ -13,23 +13,21 @@ namespace meta_tuning
 namespace impl
 {
 
-template <int Size, class T>
+template <int Size, class Value>
 struct multi_tmp
 {
-    using value_type = T;
-    using sub_type = multi_tmp<Size - 1, T>;
+    using sub_type = multi_tmp<Size - 1, Value>;
 
-    multi_tmp(value_type const& value) : value{value}, sub{value} {}
+    multi_tmp(Value const& value) : value{value}, sub{value} {}
 
-    value_type value;
+    Value value;
     sub_type sub;
 };
 
-template <class T>
-struct multi_tmp<0, T>
+template <class Value>
+struct multi_tmp<0, Value>
 {
-    using value_type = T;
-    multi_tmp(value_type const&) {}
+    multi_tmp(Value const&) {}
 };
 
 // Size is filter size
@@ -46,14 +44,16 @@ struct mult_block
         int x, int y, int i, int j, int cols)
     {
         tmp.value += A[(x + I + i) * cols + y + J + j] * Fij;
-        next()(tmp.sub, A, Fij, x, y, i, j, cols);
+        next{}(tmp.sub, A, Fij, x, y, i, j, cols);
     }
 
     template <class Tmp, class Mat>
     void update(Tmp& tmp, Mat& C, int x, int y, int cols)
     {
+        if (tmp.value < 0  ) tmp.value = 0;
+        if (tmp.value > 255) tmp.value = 255;
         C[(x + I) * cols + y + J] = tmp.value;
-        next().update(tmp.sub, C, x, y, cols);
+        next{}.update(tmp.sub, C, x, y, cols);
     }
 };
 
@@ -70,14 +70,16 @@ struct mult_block<I, MAXI, MAXJ, MAXJ>
         int x, int y, int i, int j, int cols)
     {
         tmp.value += A[(x + I + i) * cols + y + MAXJ + j] * Fij;
-        next()(tmp.sub, A, Fij, x, y, i, j, cols);
+        next{}(tmp.sub, A, Fij, x, y, i, j, cols);
     }
 
     template <class Tmp, class Mat>
     void update(Tmp& tmp, Mat& C, int x, int y, int cols)
     {
+        if (tmp.value < 0  ) tmp.value = 0;
+        if (tmp.value > 255) tmp.value = 255;
         C[(x + I) * cols + y + MAXJ] = tmp.value;
-        next().update(tmp.sub, C, x, y, cols);
+        next{}.update(tmp.sub, C, x, y, cols);
     }
 
 };
@@ -117,7 +119,7 @@ template <
 void convolve(int rows, int cols, Vec const& din, Vec& dout,
     std::array<std::array<T, N>, N> const& filter, int size)
 {
-    using value_type = typename Vec::value_type;
+    using value_type = T;
     int constexpr filter_size = N;
     auto out_rows = rows - filter_size + 1;
     auto out_cols = cols - filter_size + 1;
@@ -137,9 +139,9 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
         #pragma unroll
         for (auto i = 0; i < filter_size; i++)
             #pragma unroll
-            for (auto j = 0; j < filter_size; j++) {
+            for (auto j = 0; j < filter_size; j++)
                 block(sum, din, filter[i][j], x, y, i, j, cols);
-            }
+
         block.update(sum, dout, x, y, cols);
     }
 }
