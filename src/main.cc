@@ -22,7 +22,7 @@ auto constexpr warm_rep = 20;
 auto constexpr rep = 20;
 
 using value_type = int;
-using thread::convolve;
+using opt::convolve;
 
 std::array<std::array<value_type, 5>, 5> constexpr kernel{
     std::array<value_type, 5>{-3,  0, -1,  0,  2},
