@@ -11,6 +11,8 @@ namespace unroll
 {
 
 template <
+    int BI,
+    int BJ,
     class T,
     class Vec,
     std::size_t N
@@ -19,7 +21,7 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
     std::array<std::array<T, N>, N> const& filer, int size)
 {
     using value_type = typename Vec::value_type;
-    int filter_size = N;
+    auto constexpr filter_size = N;
     auto out_rows = rows - filter_size + 1;
     auto out_cols = cols - filter_size + 1;
     for (auto x = out_rows; x < rows; x++)
