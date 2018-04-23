@@ -112,7 +112,6 @@ struct mult_block<MAXI, MAXI, MAXJ, MAXJ>
     {
         C[(x + MAXI) * cols + y + MAXJ] = tmp.value;
     }
-
 };
 
 

@@ -1,4 +1,4 @@
-// ml:run = time -p $bin ../data/0.jpg G
+// ml:run = time -p $bin ../data/2.jpg
 // ml:ldf += -lOpenCL -I/usr/include/opencv -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_aruco -lopencv_bgsegm -lopencv_bioinspired -lopencv_ccalib -lopencv_dnn_objdetect -lopencv_dpm -lopencv_face -lopencv_photo -lopencv_freetype -lopencv_fuzzy -lopencv_hdf -lopencv_hfs -lopencv_img_hash -lopencv_line_descriptor -lopencv_optflow -lopencv_reg -lopencv_rgbd -lopencv_saliency -lopencv_stereo -lopencv_structured_light -lopencv_phase_unwrapping -lopencv_surface_matching -lopencv_tracking -lopencv_datasets -lopencv_text -lopencv_dnn -lopencv_plot -lopencv_xfeatures2d -lopencv_shape -lopencv_video -lopencv_ml -lopencv_ximgproc -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_flann -lopencv_xobjdetect -lopencv_imgcodecs -lopencv_objdetect -lopencv_xphoto -lopencv_imgproc -lopencv_core
 
 #include <iostream>
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
     t.stop();
     std::cout << "Built-in filter2D elapsed time: "
         << COLOR_ATR
-        << t.elapsed_milliseconds()/rep << "ms\n"
+        << t.elapsed_milliseconds()/rep << " ms\n"
         << COLOR_RST;
 
     #if OPEN_IMAGE
