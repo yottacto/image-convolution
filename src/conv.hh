@@ -16,7 +16,7 @@ template <
     std::size_t N
 >
 void convolve(int rows, int cols, Vec const& din, Vec& dout,
-    std::array<std::array<T, N>, N> const& filer)
+    std::array<std::array<T, N>, N> const& filer, int size = -1)
 {
     using value_type = typename Vec::value_type;
     int filter_size = N;
@@ -27,7 +27,8 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
         dout[x * cols + y] = 0;
 
     std::vector<std::thread> threads;
-    int const size = std::thread::hardware_concurrency();
+    if (size < 0)
+        size = std::thread::hardware_concurrency();
 
     for (auto i = 0; i < size; i++)
         threads.emplace_back([&](int rank) {

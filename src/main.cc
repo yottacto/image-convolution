@@ -4,6 +4,7 @@
 
 
 #include <iostream>
+#include <fstream>
 #include <iterator>
 #include <vector>
 #include <array>
@@ -18,10 +19,10 @@
 auto constexpr COLOR_RST = "\e[0m";
 auto constexpr COLOR_ATR = "\e[36m";
 auto constexpr warm_rep = 20;
-auto constexpr rep = 1;
+auto constexpr rep = 20;
 
 using value_type = int;
-using thread::convolve;
+using opt::convolve;
 
 std::array<std::array<value_type, 5>, 5> constexpr kernel{
     std::array<value_type, 5>{-3,  0, -1,  0,  2},
@@ -39,8 +40,16 @@ std::array<std::array<value_type, 5>, 5> constexpr kernel{
 //      2,  0, -1,  0, -3
 // };
 
+int size;
+
 int main(int argc, char* argv[])
 {
+
+    {
+        std::ifstream fin{"config"};
+        fin >> size;
+    }
+
     char const* filename = argc >= 2 ? argv[1] : "data/0.jpg";
     cv::Mat src;
     if (argc >= 3 && argv[2][0] == 'G')
