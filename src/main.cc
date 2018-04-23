@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     // warm up
     for (auto i = 0; i < warm_rep; i++) {
         for (auto i = 0u; i < din.size(); i++)
-            convolve(rows, cols, din[i], dout[i], kernel, size);
+            convolve<2, 2>(rows, cols, din[i], dout[i], kernel, size);
     }
 
     {
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
         t.start();
         for (auto i = 0; i < rep; i++) {
             for (auto i = 0u; i < din.size(); i++)
-                convolve(rows, cols, din[i], dout[i], kernel, size);
+                convolve<2, 2>(rows, cols, din[i], dout[i], kernel, size);
         }
         t.stop();
 
@@ -132,9 +132,7 @@ int main(int argc, char* argv[])
     cv::merge(transformed_channels, dst);
 
 
-
     #if OPEN_IMAGE
-
     cv::namedWindow("Output", cv::WINDOW_AUTOSIZE);
     cv::imshow("Output", dst);
     while (cv::waitKey(1000) != 27 /* esc */) {

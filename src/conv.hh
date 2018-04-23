@@ -21,7 +21,7 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
     std::array<std::array<T, N>, N> const& filer, int size)
 {
     using value_type = typename Vec::value_type;
-    auto constexpr filter_size = N;
+    int constexpr filter_size = N;
     auto out_rows = rows - filter_size + 1;
     auto out_cols = cols - filter_size + 1;
     for (auto x = out_rows; x < rows; x++)
@@ -31,16 +31,21 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
     size = std::min(size, omp_get_max_threads());
 
     #pragma omp parallel for num_threads(size)
-    for (auto x = 0; x < out_rows; x++)
-    for (auto y = 0; y < out_cols; y++) {
+    for (auto x = 0; x < out_rows; x += BI)
+    for (auto y = 0; y < out_cols; y += BJ) {
         auto sum = value_type{0};
         #pragma unroll
         for (auto fx = 0; fx < filter_size; fx++)
         #pragma unroll
         for (auto fy = 0; fy < filter_size; fy++) {
             auto fi = filer[fx][fy];
-            auto di = din[(x + fx) * cols + y + fy];
-            sum += fi * di;
+
+            T sum[BI * BJ] = {T{0}};
+            for (auto i = 0; i < BI; i++)
+                for (auto j = 0; j < BJ; j++) {
+                    auto di = din[(x + i + fx) * cols + y + j + fy];
+                    sum[i * BI + j] += fi * di;
+                }
         }
         if (sum < 0) sum = 0;
         if (sum > 255) sum = 255;
