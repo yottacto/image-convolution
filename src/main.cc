@@ -89,11 +89,14 @@ int main(int argc, char* argv[])
     }
 
     {
+        auto sum = 0;
         utils::timer t;
         t.start();
         for (auto i = 0; i < rep; i++) {
-            for (auto i = 0u; i < din.size(); i++)
+            for (auto i = 0u; i < din.size(); i++) {
                 convolve<BI, BJ>(rows, cols, din[i], dout[i], kernel, size);
+                sum += dout[i][400];
+            }
         }
         t.stop();
 
@@ -101,7 +104,9 @@ int main(int argc, char* argv[])
         //     << COLOR_ATR
         //     << t.elapsed_milliseconds()/rep << "ms\n"
         //     << COLOR_RST;
-        std::cout << t.elapsed_milliseconds()/rep << "\n";
+        std::cout << t.elapsed_milliseconds()/rep << " ";
+        std::cout << t.elapsed_milliseconds() << " ";
+        std::cout << sum << "\n";
     }
 
     // {
