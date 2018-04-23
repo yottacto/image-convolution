@@ -100,23 +100,23 @@ int main(int argc, char* argv[])
             << COLOR_RST;
     }
 
-    {
-        utils::timer t;
-        auto min = 1e30;
-        for (auto i = 0; i < rep; i++) {
-            t.reset();
-            t.start();
-            for (auto i = 0u; i < din.size(); i++)
-                convolve(rows, cols, din[i], dout[i], kernel, size);
-            t.stop();
-            min = std::min(min, t.elapsed_milliseconds());
-        }
+    // {
+    //     utils::timer t;
+    //     auto min = 1e30;
+    //     for (auto i = 0; i < rep; i++) {
+    //         t.reset();
+    //         t.start();
+    //         for (auto i = 0u; i < din.size(); i++)
+    //             convolve(rows, cols, din[i], dout[i], kernel, size);
+    //         t.stop();
+    //         min = std::min(min, t.elapsed_milliseconds());
+    //     }
 
-        std::cout << "Hand-written [minimum] elapsed time: "
-            << COLOR_ATR
-            << min << "ms\n"
-            << COLOR_RST;
-    }
+    //     std::cout << "Hand-written [minimum] elapsed time: "
+    //         << COLOR_ATR
+    //         << min << "ms\n"
+    //         << COLOR_RST;
+    // }
 
 
     std::vector<cv::Mat> transformed_channels(channels);
