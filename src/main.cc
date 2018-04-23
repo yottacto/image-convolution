@@ -1,5 +1,7 @@
 // ml:run = time -p $bin ../data/2.jpg
-// ml:ldf += -lOpenCL -I/usr/include/opencv -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_aruco -lopencv_bgsegm -lopencv_bioinspired -lopencv_ccalib -lopencv_dnn_objdetect -lopencv_dpm -lopencv_face -lopencv_photo -lopencv_freetype -lopencv_fuzzy -lopencv_hdf -lopencv_hfs -lopencv_img_hash -lopencv_line_descriptor -lopencv_optflow -lopencv_reg -lopencv_rgbd -lopencv_saliency -lopencv_stereo -lopencv_structured_light -lopencv_phase_unwrapping -lopencv_surface_matching -lopencv_tracking -lopencv_datasets -lopencv_text -lopencv_dnn -lopencv_plot -lopencv_xfeatures2d -lopencv_shape -lopencv_video -lopencv_ml -lopencv_ximgproc -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_flann -lopencv_xobjdetect -lopencv_imgcodecs -lopencv_objdetect -lopencv_xphoto -lopencv_imgproc -lopencv_core
+// ml:ccf += -fopenmp
+// ml:ldf += -fopenmp -lOpenCL -I/usr/include/opencv -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_aruco -lopencv_bgsegm -lopencv_bioinspired -lopencv_ccalib -lopencv_dnn_objdetect -lopencv_dpm -lopencv_face -lopencv_photo -lopencv_freetype -lopencv_fuzzy -lopencv_hdf -lopencv_hfs -lopencv_img_hash -lopencv_line_descriptor -lopencv_optflow -lopencv_reg -lopencv_rgbd -lopencv_saliency -lopencv_stereo -lopencv_structured_light -lopencv_phase_unwrapping -lopencv_surface_matching -lopencv_tracking -lopencv_datasets -lopencv_text -lopencv_dnn -lopencv_plot -lopencv_xfeatures2d -lopencv_shape -lopencv_video -lopencv_ml -lopencv_ximgproc -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_flann -lopencv_xobjdetect -lopencv_imgcodecs -lopencv_objdetect -lopencv_xphoto -lopencv_imgproc -lopencv_core
+
 
 #include <iostream>
 #include <iterator>
@@ -15,9 +17,11 @@
 
 auto constexpr COLOR_RST = "\e[0m";
 auto constexpr COLOR_ATR = "\e[36m";
-auto constexpr rep = 200;
+auto constexpr warm_rep = 20;
+auto constexpr rep = 1;
 
 using value_type = int;
+using thread::convolve;
 
 std::array<std::array<value_type, 5>, 5> constexpr kernel{
     std::array<value_type, 5>{-3,  0, -1,  0,  2},
@@ -65,19 +69,46 @@ int main(int argc, char* argv[])
         din.emplace_back(channels[i].begin<uchar>(), channels[i].end<uchar>());
     auto dout = din;
 
-    utils::timer t;
-    t.start();
-    // TODO
-    for (auto i = 0; i < rep; i++) {
-        for (auto i = 0u; i < din.size(); i++)
-            opt::convolve(rows, cols, din[i], dout[i], kernel);
-    }
-    t.stop();
 
-    std::cout << "Hand-written elapsed time: "
-        << COLOR_ATR
-        << t.elapsed_milliseconds()/rep << "ms\n"
-        << COLOR_RST;
+    // warm up
+    for (auto i = 0; i < warm_rep; i++) {
+        for (auto i = 0u; i < din.size(); i++)
+            convolve(rows, cols, din[i], dout[i], kernel);
+    }
+
+    {
+        utils::timer t;
+        t.start();
+        for (auto i = 0; i < rep; i++) {
+            for (auto i = 0u; i < din.size(); i++)
+                convolve(rows, cols, din[i], dout[i], kernel);
+        }
+        t.stop();
+
+        std::cout << "Hand-written [average] elapsed time: "
+            << COLOR_ATR
+            << t.elapsed_milliseconds()/rep << "ms\n"
+            << COLOR_RST;
+    }
+
+    {
+        utils::timer t;
+        auto min = 1e30;
+        for (auto i = 0; i < rep; i++) {
+            t.reset();
+            t.start();
+            for (auto i = 0u; i < din.size(); i++)
+                convolve(rows, cols, din[i], dout[i], kernel);
+            t.stop();
+            min = std::min(min, t.elapsed_milliseconds());
+        }
+
+        std::cout << "Hand-written [minimum] elapsed time: "
+            << COLOR_ATR
+            << min << "ms\n"
+            << COLOR_RST;
+    }
+
 
     std::vector<cv::Mat> transformed_channels(channels);
     for (auto i = 0; i < chan; i++) {
