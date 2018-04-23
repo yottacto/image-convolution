@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     auto cols = src.cols;
     auto chan = src.channels();
 
-    std::cout << "image size: " << rows << " * " << cols << "\n";
+    // std::cout << "image size: " << rows << " * " << cols << "\n";
 
     #if OPEN_IMAGE
     // cv::namedWindow("Input", cv::WINDOW_AUTOSIZE);
@@ -94,10 +94,11 @@ int main(int argc, char* argv[])
         }
         t.stop();
 
-        std::cout << "Hand-written [average] elapsed time: "
-            << COLOR_ATR
-            << t.elapsed_milliseconds()/rep << "ms\n"
-            << COLOR_RST;
+        // std::cout << "Hand-written [average] elapsed time: "
+        //     << COLOR_ATR
+        //     << t.elapsed_milliseconds()/rep << "ms\n"
+        //     << COLOR_RST;
+        std::cout << t.elapsed_milliseconds()/rep << "\n";
     }
 
     // {
