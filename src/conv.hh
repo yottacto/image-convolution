@@ -33,23 +33,28 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
     #pragma omp parallel for num_threads(size)
     for (auto x = 0; x < out_rows; x += BI)
     for (auto y = 0; y < out_cols; y += BJ) {
-        auto sum = value_type{0};
+        value_type sum[BI * BJ] = {value_type{0}};
+
         #pragma unroll
         for (auto fx = 0; fx < filter_size; fx++)
         #pragma unroll
         for (auto fy = 0; fy < filter_size; fy++) {
             auto fi = filer[fx][fy];
 
-            T sum[BI * BJ] = {T{0}};
             for (auto i = 0; i < BI; i++)
                 for (auto j = 0; j < BJ; j++) {
                     auto di = din[(x + i + fx) * cols + y + j + fy];
-                    sum[i * BI + j] += fi * di;
+                    sum[i * BJ + j] += fi * di;
                 }
         }
-        if (sum < 0) sum = 0;
-        if (sum > 255) sum = 255;
-        dout[x * cols + y] = sum;
+
+        for (auto i = 0; i < BI; i++)
+            for (auto j = 0; j < BJ; j++) {
+                auto s = sum[i * BJ + j];
+                if (s < 0) s = 0;
+                if (s > 255) s = 255;
+                dout[(x + i) * cols + y + j] = s;
+            }
     }
 }
 
