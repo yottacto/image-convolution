@@ -71,7 +71,7 @@ template <
     std::size_t N
 >
 void convolve(int rows, int cols, Vec const& din, Vec& dout,
-    std::array<std::array<T, N>, N> const& filer)
+    std::array<std::array<T, N>, N> const& filer, int)
 {
     using value_type = typename Vec::value_type;
     int filter_size = N;

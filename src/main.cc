@@ -22,7 +22,7 @@ auto constexpr warm_rep = 20;
 auto constexpr rep = 20;
 
 using value_type = int;
-using opt::convolve;
+using thread::convolve;
 
 std::array<std::array<value_type, 5>, 5> constexpr kernel{
     std::array<value_type, 5>{-3,  0, -1,  0,  2},
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     // warm up
     for (auto i = 0; i < warm_rep; i++) {
         for (auto i = 0u; i < din.size(); i++)
-            convolve(rows, cols, din[i], dout[i], kernel);
+            convolve(rows, cols, din[i], dout[i], kernel, size);
     }
 
     {
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
         t.start();
         for (auto i = 0; i < rep; i++) {
             for (auto i = 0u; i < din.size(); i++)
-                convolve(rows, cols, din[i], dout[i], kernel);
+                convolve(rows, cols, din[i], dout[i], kernel, size);
         }
         t.stop();
 
@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
             t.reset();
             t.start();
             for (auto i = 0u; i < din.size(); i++)
-                convolve(rows, cols, din[i], dout[i], kernel);
+                convolve(rows, cols, din[i], dout[i], kernel, size);
             t.stop();
             min = std::min(min, t.elapsed_milliseconds());
         }
