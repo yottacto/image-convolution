@@ -38,19 +38,15 @@ struct mult_block
 {
     using next = mult_block<I, MAXI, J + 1, MAXJ>;
 
-    template <class Tmp, class MatA, class T, std::size_t Size>
+    template <class Tmp, class MatA, class T>
     void operator()(
         Tmp& tmp,
         MatA const& A,
-        std::array<std::array<T, Size>, Size> const& B,
-        int x, int y, int cols)
+        T Fij,
+        int x, int y, int i, int j, int cols)
     {
-        #pragma unroll
-        for (auto i = 0u; i < Size; i++)
-            #pragma unroll
-            for (auto j = 0u; j < Size; j++)
-                tmp.value += A[(x + I + i) * cols + y + J + j] * B[i][j];
-        next()(tmp.sub, A, B, x, y, cols);
+        tmp.value += A[(x + I + i) * cols + y + J + j] * Fij;
+        next()(tmp.sub, A, Fij, x, y, i, j, cols);
     }
 
     template <class Tmp, class Mat>
@@ -66,19 +62,15 @@ struct mult_block<I, MAXI, MAXJ, MAXJ>
 {
     using next = mult_block<I + 1, MAXI, 0, MAXJ>;
 
-    template <class Tmp, class MatA, class T, std::size_t Size>
+    template <class Tmp, class MatA, class T>
     void operator()(
         Tmp& tmp,
         MatA const& A,
-        std::array<std::array<T, Size>, Size> const& B,
-        int x, int y, int cols)
+        T Fij,
+        int x, int y, int i, int j, int cols)
     {
-        #pragma unroll
-        for (auto i = 0u; i < Size; i++)
-            #pragma unroll
-            for (auto j = 0u; j < Size; j++)
-                tmp.value += A[(x + I + i) * cols + y + MAXJ + j] * B[i][j];
-        next()(tmp.sub, A, B, x, y, cols);
+        tmp.value += A[(x + I + i) * cols + y + MAXJ + j] * Fij;
+        next()(tmp.sub, A, Fij, x, y, i, j, cols);
     }
 
     template <class Tmp, class Mat>
@@ -93,23 +85,21 @@ struct mult_block<I, MAXI, MAXJ, MAXJ>
 template <int MAXI, int MAXJ>
 struct mult_block<MAXI, MAXI, MAXJ, MAXJ>
 {
-    template <class Tmp, class MatA, class T, std::size_t Size>
+    template <class Tmp, class MatA, class T>
     void operator()(
         Tmp& tmp,
         MatA const& A,
-        std::array<std::array<T, Size>, Size> const& B,
-        int x, int y, int cols)
+        T Fij,
+        int x, int y, int i, int j, int cols)
     {
-        #pragma unroll
-        for (auto i = 0u; i < Size; i++)
-            #pragma unroll
-            for (auto j = 0u; j < Size; j++)
-                tmp.value += A[(x + MAXI + i) * cols + y + MAXJ + j] * B[i][j];
+        tmp.value += A[(x + MAXI + i) * cols + y + MAXJ + j] * Fij;
     }
 
     template <class Tmp, class Mat>
     void update(Tmp& tmp, Mat& C, int x, int y, int cols)
     {
+        if (tmp.value < 0  ) tmp.value = 0;
+        if (tmp.value > 255) tmp.value = 255;
         C[(x + MAXI) * cols + y + MAXJ] = tmp.value;
     }
 };
@@ -143,7 +133,13 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
     for (auto x = 0; x < out_rows; x += BI)
     for (auto y = 0; y < out_cols; y += BJ) {
         impl::multi_tmp<BI * BJ, value_type> sum(value_type{0});
-        block(sum, din, filter, x, y, cols);
+
+        #pragma unroll
+        for (auto i = 0; i < filter_size; i++)
+            #pragma unroll
+            for (auto j = 0; j < filter_size; j++) {
+                block(sum, din, filter[i][j], x, y, i, j, cols);
+            }
         block.update(sum, dout, x, y, cols);
     }
 }
