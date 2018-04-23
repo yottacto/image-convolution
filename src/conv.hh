@@ -33,25 +33,25 @@ struct multi_tmp<0, T>
 };
 
 // Size is filter size
-template <class T, int I, int MAXI, int J, int MAXJ, int Size>
+template <int I, int MAXI, int J, int MAXJ>
 struct mult_block
 {
-    using next = mult_block<T, I, MAXI, J + 1, MAXJ, Size>;
+    using next = mult_block<I, MAXI, J + 1, MAXJ>;
 
-    template <class Tmp, class MatA, class MatB>
-    void operator()(Tmp& tmp,
+    template <class Tmp, class MatA, class T, std::size_t Size>
+    void operator()(
+        Tmp& tmp,
         MatA const& A,
         std::array<std::array<T, Size>, Size> const& B,
         int x, int y, int cols)
     {
         #pragma unroll
-        for (auto i = 0; i < Size; i++)
+        for (auto i = 0u; i < Size; i++)
             #pragma unroll
-            for (auto j = 0; j < Size; j++)
+            for (auto j = 0u; j < Size; j++)
                 tmp.value += A[(x + I + i) * cols + y + J + j] * B[i][j];
         next()(tmp.sub, A, B, x, y, cols);
     }
-
 
     template <class Tmp, class Mat>
     void update(Tmp& tmp, Mat& C, int x, int y, int cols)
@@ -59,24 +59,24 @@ struct mult_block
         C[(x + I) * cols + y + J] = tmp.value;
         next().update(tmp.sub, C, x, y, cols);
     }
-
 };
 
-template <class T, int I, int MAXI, int MAXJ, int Size>
-struct mult_block<T, I, MAXI, MAXJ, MAXJ, Size>
+template <int I, int MAXI, int MAXJ>
+struct mult_block<I, MAXI, MAXJ, MAXJ>
 {
-    using next = mult_block<T, I + 1, MAXI, 0, MAXJ, Size>;
+    using next = mult_block<I + 1, MAXI, 0, MAXJ>;
 
-    template <class Tmp, class MatA, class MatB>
-    void operator()(Tmp& tmp,
+    template <class Tmp, class MatA, class T, std::size_t Size>
+    void operator()(
+        Tmp& tmp,
         MatA const& A,
         std::array<std::array<T, Size>, Size> const& B,
         int x, int y, int cols)
     {
         #pragma unroll
-        for (auto i = 0; i < Size; i++)
+        for (auto i = 0u; i < Size; i++)
             #pragma unroll
-            for (auto j = 0; j < Size; j++)
+            for (auto j = 0u; j < Size; j++)
                 tmp.value += A[(x + I + i) * cols + y + MAXJ + j] * B[i][j];
         next()(tmp.sub, A, B, x, y, cols);
     }
@@ -90,19 +90,20 @@ struct mult_block<T, I, MAXI, MAXJ, MAXJ, Size>
 
 };
 
-template <class T, int MAXI, int MAXJ, int Size>
-struct mult_block<T, MAXI, MAXI, MAXJ, MAXJ, Size>
+template <int MAXI, int MAXJ>
+struct mult_block<MAXI, MAXI, MAXJ, MAXJ>
 {
-    template <class Tmp, class MatA, class MatB>
-    void operator()(Tmp& tmp,
+    template <class Tmp, class MatA, class T, std::size_t Size>
+    void operator()(
+        Tmp& tmp,
         MatA const& A,
         std::array<std::array<T, Size>, Size> const& B,
         int x, int y, int cols)
     {
         #pragma unroll
-        for (auto i = 0; i < Size; i++)
+        for (auto i = 0u; i < Size; i++)
             #pragma unroll
-            for (auto j = 0; j < Size; j++)
+            for (auto j = 0u; j < Size; j++)
                 tmp.value += A[(x + MAXI + i) * cols + y + MAXJ + j] * B[i][j];
     }
 
@@ -137,13 +138,13 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
 
     size = std::min(size, omp_get_max_threads());
 
-    impl::mult_block<value_type, 0, BI - 1, 0, BJ - 1, filter_size> block;
+    impl::mult_block<0, BI - 1, 0, BJ - 1> block;
 
     #pragma omp parallel for num_threads(size)
     for (auto x = 0; x < out_rows; x += BI)
     for (auto y = 0; y < out_cols; y += BJ) {
         impl::multi_tmp<BI * BJ, value_type> sum(value_type{0});
-        block(sum, din, filter, x, y, cols, filter_size);
+        block(sum, din, filter, x, y, cols);
         block.update(sum, dout, x, y, cols);
     }
 }
