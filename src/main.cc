@@ -21,6 +21,9 @@ auto constexpr COLOR_ATR = "\e[36m";
 auto constexpr warm_rep = 20;
 auto constexpr rep = 20;
 
+auto constexpr BI = 4;
+auto constexpr BJ = 4;
+
 using value_type = int;
 using unroll::convolve;
 
@@ -82,7 +85,7 @@ int main(int argc, char* argv[])
     // warm up
     for (auto i = 0; i < warm_rep; i++) {
         for (auto i = 0u; i < din.size(); i++)
-            convolve<2, 2>(rows, cols, din[i], dout[i], kernel, size);
+            convolve<BI, BJ>(rows, cols, din[i], dout[i], kernel, size);
     }
 
     {
@@ -90,7 +93,7 @@ int main(int argc, char* argv[])
         t.start();
         for (auto i = 0; i < rep; i++) {
             for (auto i = 0u; i < din.size(); i++)
-                convolve<2, 2>(rows, cols, din[i], dout[i], kernel, size);
+                convolve<BI, BJ>(rows, cols, din[i], dout[i], kernel, size);
         }
         t.stop();
 
