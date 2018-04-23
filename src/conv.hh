@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <array>
+#include <omp.h>
 
 namespace opt
 {
@@ -21,6 +22,7 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
     for (auto y = out_cols; y < cols; y++)
         dout[x * cols + y] = 0;
 
+    #pragma omp parallel for num_threads(8)
     for (auto x = 0; x < out_rows; x++)
     for (auto y = 0; y < out_cols; y++) {
         auto sum = value_type{0};
