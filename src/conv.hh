@@ -58,25 +58,28 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
 
     #pragma omp parallel for schedule(auto) num_threads(size)
     for (auto x = 0; x < out_rows; x += BI)
-    for (auto y = 0; y < out_cols; y += BJ * 8) {
+    for (auto y = 0; y < out_cols; y += BJ * 16) {
         // value_type
-        __m256 sum[BI * BJ] = {_mm256_setzero_ps()};
+        __m512i sum[BI * BJ] = {_mm512_setzero_epi32()};
 
         #pragma unroll
         for (auto fx = 0; fx < filter_size; fx++)
         #pragma unroll
         for (auto fy = 0; fy < filter_size; fy++) {
             // auto fi = filter[fx][fy];
-            __m256 fi = __mm256_broadcast_ss(filter.data()
-                + fx * filter_size + fy);
+            // __m256 fi = __mm256_broadcast_ss(filter.data()
+            //     + fx * filter_size + fy);
+            __m512i fi = _mm512_load_epi32(filter.data() + fx * filter_size + fy);
 
 
             for (auto i = 0; i < BI; i++)
             for (auto j = 0; j < BJ; j++) {
-                __m256 di = __mm256_loadu_ps(din.data()
-                    + (x + fx + i) * cols
-                    + y + fy + j * 8);
-                sum[i * BJ + j] = __mm256_fmadd_ps(fi, di, sum[i * BJ + j]);
+                __m512i di = _mm512_load_epi32(din.data()
+                    + (x + fx + i) * cols + y + fy + j * 8);
+                sum[i * BJ + j] = _mm512_add_epi32(
+                    _mm512_mul_epi32(fi, di),
+                    sum[i * BJ + j]
+                );
             }
         }
 
@@ -86,8 +89,8 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
                 // if (s < 0) s = 0;
                 // if (s > 255) s = 255;
 
-                __mm256_storeu_ps(
-                    dout.data + (x + i) * cols + y + j * 8,
+                _mm512_store_epi32(
+                    dout.data() + (x + i) * cols + y + j * 8,
                     sum[i * BJ + j]
                 );
             }
