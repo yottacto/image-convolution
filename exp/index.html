@@ -428,10 +428,103 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <body class="article">
 <div id="header">
 <h1>Results of experiments</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_opencl">OpenCL</a></li>
+<li><a href="#_basic_info_of_cpus">Basic info of CPUs</a></li>
+<li><a href="#_naive_method">Naive method</a></li>
+<li><a href="#_opencv_built_in_filter2d">Opencv built-in filter2d</a></li>
+<li><a href="#_std_thread">std::thread</a></li>
+<li><a href="#_openmp">OpenMP</a></li>
+<li><a href="#_meta_tuning">Meta-tuning</a></li>
+<li><a href="#_loop_tiling">Loop tiling</a></li>
+<li><a href="#_avx_512_vectorization">AVX-512 vectorization</a></li>
+</ul>
+</div>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_basic_info">Basic info</h2>
+<h2 id="_opencl">OpenCL</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>tims in ms.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 4.7619%;">
+<col style="width: 9.5238%;">
+<col style="width: 9.5238%;">
+<col style="width: 9.5238%;">
+<col style="width: 9.5238%;">
+<col style="width: 9.5238%;">
+<col style="width: 9.5238%;">
+<col style="width: 9.5238%;">
+<col style="width: 9.5238%;">
+<col style="width: 9.5238%;">
+<col style="width: 9.5239%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-middle"></th>
+<th class="tableblock halign-center valign-middle">simple</th>
+<th class="tableblock halign-center valign-middle">constant</th>
+<th class="tableblock halign-center valign-middle">local (8*8)</th>
+<th class="tableblock halign-center valign-middle">local (16*16)</th>
+<th class="tableblock halign-center valign-middle">local (32*32)</th>
+<th class="tableblock halign-center valign-middle">multi (8*8) &lt;2,1&gt;</th>
+<th class="tableblock halign-center valign-middle">multi (16*16) &lt;2,1&gt;</th>
+<th class="tableblock halign-center valign-middle">multi (32*32) &lt;2,1&gt;</th>
+<th class="tableblock halign-center valign-middle">multi (16*16) &lt;1,2&gt;</th>
+<th class="tableblock halign-center valign-middle">multi (16*16) &lt;2 2&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">pic0</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">1.384167</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.738586</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.70481</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.701904</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.694714</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.747449</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.701318</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.726282</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.713159</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.698975</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">pic1</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">3.201758</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">1.308984</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">1.087073</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">1.083179</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">1.094031</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">1.249792</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">1.099109</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">1.262695</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">1.116748</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">1.136792</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">pic2</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">19.966125</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">5.286694</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">4.290442</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">4.280688</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">4.310461</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">5.455676</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">4.466699</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">5.409204</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">4.484753</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">4.781201</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_basic_info_of_cpus">Basic info of CPUs</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>laptop, Intel Core i7-6700HQ CPU @ 2.60GHz, 8 processors, 4 cpu cores
@@ -468,10 +561,45 @@ KNL, Intel Xeon Phi CPU 7210 @ 1.30GHz, 256 processors, 64 cpu cores</p>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">490.143</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL/ 1</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL / 1</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">27.6799</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">89.8364</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">558.697</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_opencv_built_in_filter2d">Opencv built-in filter2d</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-middle">machine / used thread(s)</th>
+<th class="tableblock halign-center valign-middle">pic0 (ms)</th>
+<th class="tableblock halign-center valign-middle">pic1 (ms)</th>
+<th class="tableblock halign-center valign-middle">pic2 (ms)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">PC / 1</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">5.44112</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">17.6667</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">112.107</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL / 1</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">14.5938</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">45.5257</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">294.094</p></td>
 </tr>
 </tbody>
 </table>
@@ -506,7 +634,7 @@ KNL, Intel Xeon Phi CPU 7210 @ 1.30GHz, 256 processors, 64 cpu cores</p>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">568.71</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL/ (20, 40, 60)</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL / (20, 40, 60)</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">12.8181</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">24.8301</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">75.3073</p></td>
@@ -544,7 +672,7 @@ KNL, Intel Xeon Phi CPU 7210 @ 1.30GHz, 256 processors, 64 cpu cores</p>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">708.531</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL/ 180</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL / 180</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">1.73209</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">5.84894</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">32.8231</p></td>
@@ -554,7 +682,45 @@ KNL, Intel Xeon Phi CPU 7210 @ 1.30GHz, 256 processors, 64 cpu cores</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_basic_unroll">Basic unroll</h2>
+<h2 id="_meta_tuning">Meta-tuning</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>using c++ template meta-programming techiques to tuning.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-middle">machine / used thread(s)</th>
+<th class="tableblock halign-center valign-middle">pic0 (ms)</th>
+<th class="tableblock halign-center valign-middle">pic1 (ms)</th>
+<th class="tableblock halign-center valign-middle">pic2 (ms)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">PC / (4, 6, 6), &lt;2, 16&gt;</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">13.0327</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">55.5592</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">390.986</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL / (120, 230, 120), &lt;2, 16&gt;</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.853256</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">2.75459</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">12.4232</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_loop_tiling">Loop tiling</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><code>BI</code> means block height, <code>BJ</code> means block width.</p>
@@ -588,16 +754,60 @@ KNL, Intel Xeon Phi CPU 7210 @ 1.30GHz, 256 processors, 64 cpu cores</p>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">6.05637</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL/ 120, &lt;8, 8&gt;</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL / 120, &lt;8, 8&gt;</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">0.263038</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">0.563002</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">3.91969</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL/ 140, &lt;16, 16&gt;</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL / 140, &lt;16, 16&gt;</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">\</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">\</p></td>
 <td class="tableblock halign-center valign-middle"><p class="tableblock">2.87048</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL / 140, &lt;16, 32&gt;</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">\</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">\</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">2.80441</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL / (120, 120, 180), &lt;4, 64&gt;</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.167442</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.36659</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">1.68509</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_avx_512_vectorization">AVX-512 vectorization</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>using Intel AVX-512 to do some explicit vectorization.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-middle">machine / used thread(s), &lt;BI, BJ&gt;</th>
+<th class="tableblock halign-center valign-middle">pic0 (ms)</th>
+<th class="tableblock halign-center valign-middle">pic1 (ms)</th>
+<th class="tableblock halign-center valign-middle">pic2 (ms)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">KNL / (120, 130, 180), &lt;4, 4&gt;</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.155461</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">0.321393</p></td>
+<td class="tableblock halign-center valign-middle"><p class="tableblock">1.44656</p></td>
 </tr>
 </tbody>
 </table>
@@ -606,7 +816,7 @@ KNL, Intel Xeon Phi CPU 7210 @ 1.30GHz, 256 processors, 64 cpu cores</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-04-23 21:18:13 CST
+Last updated 2018-04-24 14:08:08 CST
 </div>
 </div>
 </body>
