@@ -148,7 +148,7 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
 
 } // namespace meta_tuning
 
-namespace unroll
+namespace loop_tiling
 {
 
 template <
@@ -199,7 +199,7 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
     }
 }
 
-} // namespace unroll
+} // namespace loop_tiling
 
 namespace thread
 {

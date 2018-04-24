@@ -26,7 +26,8 @@ auto constexpr BI = 4;
 auto constexpr BJ = 4;
 
 using value_type = int;
-using meta_tuning::convolve;
+using loop_tiling::convolve;
+// using meta_tuning::convolve;
 
 std::array<std::array<value_type, 5>, 5> constexpr kernel{
     std::array<value_type, 5>{-3,  0, -1,  0,  2},
