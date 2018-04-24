@@ -1,2 +1,22 @@
-== Image convolution
+:toc:
+
+= Image convolution
+
+Optimize image convolution on CPU, especially for Intel Knights Landing.
+
+== Methods
+
+=== Naive implementation
+
+=== OpenCV built-in `filter2d`
+
+=== Using `std::thread`
+
+=== Using `OpenMP`
+
+=== Meta-tuning
+
+=== Loop tiling
+
+=== Vectorization via AVX-512
 
