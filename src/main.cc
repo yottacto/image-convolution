@@ -96,7 +96,6 @@ int main(int argc, char* argv[])
 
 
     {
-        auto sum = 0;
         utils::timer t;
         t.start();
         for (auto i = 0; i < rep; i++) {
@@ -104,12 +103,15 @@ int main(int argc, char* argv[])
             convolve<BI, BJ>(rows, cols, din[0], dout[0], kernel, size);
             convolve<BI, BJ>(rows, cols, din[1], dout[1], kernel, size);
             convolve<BI, BJ>(rows, cols, din[2], dout[2], kernel, size);
-            sum += dout[0][400];
-            sum += dout[1][400];
-            sum += dout[2][400];
         }
 
         t.stop();
+        auto sum = 0ll;
+        for (auto i = 0u; i < dout[0].size(); i++) {
+            sum += dout[0][i];
+            sum += dout[1][i];
+            sum += dout[2][i];
+        }
 
         // std::cout << "Hand-written [average] elapsed time: "
         //     << COLOR_ATR
