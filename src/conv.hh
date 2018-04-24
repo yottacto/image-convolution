@@ -46,7 +46,6 @@ template <
 void convolve(int rows, int cols, Vec const& din, Vec& dout,
     std::array<T, N> const& filter, int size)
 {
-    using value_type = typename Vec::value_type;
     int constexpr filter_size = detail::ct_sqrt(N);
     auto out_rows = rows - filter_size + 1;
     auto out_cols = cols - filter_size + 1;
@@ -59,16 +58,12 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
     #pragma omp parallel for schedule(auto) num_threads(size)
     for (auto x = 0; x < out_rows; x += BI)
     for (auto y = 0; y < out_cols; y += BJ * 16) {
-        // value_type
         __m512i sum[BI * BJ] = {_mm512_setzero_epi32()};
 
         #pragma unroll
         for (auto fx = 0; fx < filter_size; fx++)
         #pragma unroll
         for (auto fy = 0; fy < filter_size; fy++) {
-            // auto fi = filter[fx][fy];
-            // __m256 fi = __mm256_broadcast_ss(filter.data()
-            //     + fx * filter_size + fy);
             __m512i fi = _mm512_load_epi32(filter.data() + fx * filter_size + fy);
 
 
@@ -254,7 +249,7 @@ template <
 void convolve(int rows, int cols, Vec const& din, Vec& dout,
     std::array<std::array<T, N>, N> const& filter, int size)
 {
-    using value_type = typename Vec::value_type;
+    using value_type = T;
     int constexpr filter_size = N;
     auto out_rows = rows - filter_size + 1;
     auto out_cols = cols - filter_size + 1;
@@ -314,7 +309,7 @@ template <
 void convolve(int rows, int cols, Vec const& din, Vec& dout,
     std::array<std::array<T, N>, N> const& filter, int size = -1)
 {
-    using value_type = typename Vec::value_type;
+    using value_type = T;
     int filter_size = N;
     auto out_rows = rows - filter_size + 1;
     auto out_cols = cols - filter_size + 1;
@@ -371,7 +366,7 @@ template <
 void convolve(int rows, int cols, Vec const& din, Vec& dout,
     std::array<std::array<T, N>, N> const& filter, int size)
 {
-    using value_type = typename Vec::value_type;
+    using value_type = T;
     int filter_size = N;
     auto out_rows = rows - filter_size + 1;
     auto out_cols = cols - filter_size + 1;
@@ -399,7 +394,7 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
 
 } // namespace omp
 
-namespace opt
+namespace basic
 {
 
 template <
@@ -412,7 +407,7 @@ template <
 void convolve(int rows, int cols, Vec const& din, Vec& dout,
     std::array<std::array<T, N>, N> const& filter, int)
 {
-    using value_type = typename Vec::value_type;
+    using value_type = T;
     int filter_size = N;
     auto out_rows = rows - filter_size + 1;
     auto out_cols = cols - filter_size + 1;
@@ -435,5 +430,5 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
     }
 }
 
-} // namespace opt
+} // namespace basic
 

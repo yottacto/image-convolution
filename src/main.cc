@@ -15,7 +15,7 @@
 #include "timer.hh"
 #include "conv.hh"
 
-#define OPEN_IMAGE 1
+#define DISPLAY_IMAGE 1
 #define AVX 0
 
 auto constexpr COLOR_RST = "\e[0m";
@@ -35,7 +35,7 @@ using meta_tuning::convolve;
 // using loop_tiling::convolve;
 // using thread::convolve;
 // using omp::convolve;
-// using opt::convolve;
+// using basic::convolve;
 #endif
 
 
@@ -78,11 +78,11 @@ int main(int argc, char* argv[])
     auto cols = src.cols;
     auto chan = src.channels();
 
-    assert(chan == 3);
+    // assert(chan == 3);
 
     // std::cout << "image size: " << rows << " * " << cols << "\n";
 
-    #if OPEN_IMAGE
+    #if DISPLAY_IMAGE
     cv::namedWindow("Input", cv::WINDOW_NORMAL);
     cv::setWindowProperty("Input", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
     cv::imshow("Input", src);
@@ -101,10 +101,11 @@ int main(int argc, char* argv[])
 
     // warm up
     for (auto i = 0; i < warm_rep; i++) {
-        // for (auto i = 0u; i < din.size(); i++)
-        convolve<BI, BJ>(rows, cols, din[0], dout[0], kernel, size);
-        convolve<BI, BJ>(rows, cols, din[1], dout[1], kernel, size);
-        convolve<BI, BJ>(rows, cols, din[2], dout[2], kernel, size);
+        for (auto i = 0u; i < din.size(); i++)
+            convolve<BI, BJ>(rows, cols, din[i], dout[i], kernel, size);
+        // convolve<BI, BJ>(rows, cols, din[0], dout[0], kernel, size);
+        // convolve<BI, BJ>(rows, cols, din[1], dout[1], kernel, size);
+        // convolve<BI, BJ>(rows, cols, din[2], dout[2], kernel, size);
     }
 
 
@@ -112,10 +113,11 @@ int main(int argc, char* argv[])
         utils::timer t;
         t.start();
         for (auto i = 0; i < rep; i++) {
-            // for (auto i = 0u; i < din.size(); i++) {
-            convolve<BI, BJ>(rows, cols, din[0], dout[0], kernel, size);
-            convolve<BI, BJ>(rows, cols, din[1], dout[1], kernel, size);
-            convolve<BI, BJ>(rows, cols, din[2], dout[2], kernel, size);
+            for (auto i = 0u; i < din.size(); i++)
+                convolve<BI, BJ>(rows, cols, din[i], dout[i], kernel, size);
+            // convolve<BI, BJ>(rows, cols, din[0], dout[0], kernel, size);
+            // convolve<BI, BJ>(rows, cols, din[1], dout[1], kernel, size);
+            // convolve<BI, BJ>(rows, cols, din[2], dout[2], kernel, size);
         }
 
         t.stop();
@@ -126,12 +128,12 @@ int main(int argc, char* argv[])
             sum += dout[2][i];
         }
 
-        // std::cout << "Hand-written [average] elapsed time: "
-        //     << COLOR_ATR
-        //     << t.elapsed_milliseconds()/rep << "ms\n"
-        //     << COLOR_RST;
-        std::cout << t.elapsed_milliseconds()/rep << " ";
-        std::cout << t.elapsed_milliseconds() << " ";
+        std::cout << "Hand-written [average] elapsed time: "
+            << COLOR_ATR
+            << t.elapsed_milliseconds()/rep << "ms\n"
+            << COLOR_RST;
+        // std::cout << t.elapsed_milliseconds()/rep << " ";
+        // std::cout << t.elapsed_milliseconds() << " ";
         std::cout << sum << "\n";
     }
 
@@ -167,7 +169,7 @@ int main(int argc, char* argv[])
     cv::merge(transformed_channels, dst);
 
 
-    #if OPEN_IMAGE
+    #if DISPLAY_IMAGE
     cv::namedWindow("Output", cv::WINDOW_NORMAL);
     cv::setWindowProperty("Output", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
     cv::imshow("Output", dst);

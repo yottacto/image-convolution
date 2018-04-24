@@ -8,7 +8,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include "timer.hh"
 
-#define OPEN_IMAGE 1
+#define DISPLAY_IMAGE 1
 
 auto constexpr COLOR_RST = "\e[0m";
 auto constexpr COLOR_ATR = "\e[36m";
@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
     else
         src = cv::imread(filename, cv::IMREAD_COLOR);
 
-    #if OPEN_IMAGE
+    #if DISPLAY_IMAGE
     cv::namedWindow("Input", cv::WINDOW_NORMAL);
     cv::setWindowProperty("Input", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
     cv::imshow("Input", src);
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
         << t.elapsed_milliseconds()/rep << " ms\n"
         << COLOR_RST;
 
-    #if OPEN_IMAGE
+    #if DISPLAY_IMAGE
     // cv::namedWindow("Output", cv::WINDOW_AUTOSIZE);
     cv::namedWindow("Output", cv::WINDOW_NORMAL);
     cv::setWindowProperty("Output", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);

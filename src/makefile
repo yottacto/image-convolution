@@ -22,7 +22,7 @@ clean:
 	rm -rf $(BUILD)/
 test: all
 	@echo -e "$(COLOR_ACT)running $(COLOR_ARG)$(BIN)$(COLOR_RST)..."
-	$(BIN)
+	time -p $(BIN) ../data/2.jpg
 reconf:
 	@echo -e "$(COLOR_ACT)reconfiguring$(COLOR_RST)..."
 	./configure
