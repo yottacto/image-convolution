@@ -1,0 +1,62 @@
+= Image convolution
+:author: yottacto
+:source-highlighter: highlightjs
+// :revealjs_theme: beige
+// :revealjs_theme: simple
+// :revealjs_theme: night
+// :customcss: style.css
+
+== Result
+
+[cols="^.^1, ^.^1, ^.^1, ^.^1", options="header"]
+|====
+|  best  | pic0 (ms) | pic1 (ms) | pic2 (ms)
+| OpenCL | 0.694714  | 1.083179  | 4.280688
+|  CPU   |   have    |     a     |   guess?
+|====
+
+== Arms race
+
+[%step]
+* CPU vs. GPU
+* fine-tuned vs. OpenCL
+
+[transition=zoom, %notitle]
+== OpenCL implementation
+
+[%step]
+* constant memory
+* local memory
+* multi items
+
+[transition-speed=fast, %notitle]
+== CPU's potential
+
+[%step]
+* Intel Core i7-6700HQ CPU @ 2.60GHz, 8 processors, 4 cpu cores
+* KNL, Intel Xeon Phi CPU 7210 @ 1.30GHz, 256 processors, 64 cpu cores
+
+== Optimization
+[%step]
+* naive implementation
+* compiler options (compiler optimization techniques)
+
+=== `std::thread`
+
+=== OpenMP
+
+=== Meta tuning
+
+=== Loop tiling
+
+=== Vectorization, AVX-512
+
+== Result
+
+[cols="^.^1, ^.^1, ^.^1, ^.^1", options="header"]
+|====
+|  best  | pic0 (ms) | pic1 (ms) | pic2 (ms)
+| OpenCL | 0.694714  | 1.083179  | 4.280688
+|  CPU   | 0.155461  | 0.321393  |  1.44656
+|====
+
