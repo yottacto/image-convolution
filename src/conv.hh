@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <thread>
 #include <array>
+#include <immintrin.h>
 #include <omp.h>
 
 namespace meta_tuning
@@ -131,7 +132,7 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
 
     impl::mult_block<0, BI - 1, 0, BJ - 1> block;
 
-    #pragma omp parallel for num_threads(size)
+    #pragma omp parallel for schedule(auto) num_threads(size) private(block)
     for (auto x = 0; x < out_rows; x += BI)
     for (auto y = 0; y < out_cols; y += BJ) {
         impl::multi_tmp<BI * BJ, value_type> sum(value_type{0});
@@ -171,7 +172,7 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
 
     size = std::min(size, omp_get_max_threads());
 
-    #pragma omp parallel for num_threads(size)
+    #pragma omp parallel for schedule(auto) num_threads(size)
     for (auto x = 0; x < out_rows; x += BI)
     for (auto y = 0; y < out_cols; y += BJ) {
         value_type sum[BI * BJ] = {value_type{0}};
@@ -182,11 +183,18 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
         for (auto fy = 0; fy < filter_size; fy++) {
             auto fi = filter[fx][fy];
 
+
             for (auto i = 0; i < BI; i++)
-                for (auto j = 0; j < BJ; j++) {
-                    auto di = din[(x + i + fx) * cols + y + j + fy];
-                    sum[i * BJ + j] += fi * di;
-                }
+            for (auto j = 0; j < BJ; j++) {
+                auto const tid = (x + i + fx) * cols + y + j + fy;
+
+                // _MM_HINT_T0, _MM_HINT_T1, _MM_HINT_T2, _MM_HINT_NTA
+                _mm_prefetch((const char*)(din[tid + 5].next), _MM_HINT_T1);
+                _mm_prefetch((const char*)(din[tid + 2].next), _MM_HINT_T1);
+
+                auto di = din[tid];
+                sum[i * BJ + j] += fi * di;
+            }
         }
 
         for (auto i = 0; i < BI; i++)

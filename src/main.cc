@@ -22,8 +22,8 @@ auto constexpr COLOR_ATR = "\e[36m";
 auto constexpr warm_rep = 20;
 auto constexpr rep = 20;
 
-auto constexpr BI = 4;
-auto constexpr BJ = 4;
+auto constexpr BI = 2;
+auto constexpr BJ = 16;
 
 using value_type = int;
 using loop_tiling::convolve;
