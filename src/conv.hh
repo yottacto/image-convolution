@@ -8,6 +8,72 @@
 #include <immintrin.h>
 #include <omp.h>
 
+namespace vectorization
+{
+
+template <
+    int BI,
+    int BJ,
+    class T,
+    class Vec,
+    std::size_t N
+>
+void convolve(int rows, int cols, Vec const& din, Vec& dout,
+    std::array<std::array<T, N>, N> const& filter, int size)
+{
+    using value_type = typename Vec::value_type;
+    int constexpr filter_size = N;
+    auto out_rows = rows - filter_size + 1;
+    auto out_cols = cols - filter_size + 1;
+    for (auto x = out_rows; x < rows; x++)
+    for (auto y = out_cols; y < cols; y++)
+        dout[x * cols + y] = 0;
+
+    size = std::min(size, omp_get_max_threads());
+
+    #pragma omp parallel for schedule(auto) num_threads(size)
+    for (auto x = 0; x < out_rows; x += BI)
+    for (auto y = 0; y < out_cols; y += BJ * 8) {
+        // value_type
+        __m256 sum[BI * BJ] = {_mm256_setzero_ps()};
+
+        #pragma unroll
+        for (auto fx = 0; fx < filter_size; fx++)
+        #pragma unroll
+        for (auto fy = 0; fy < filter_size; fy++) {
+            // auto fi = filter[fx][fy];
+            __m256 fi = __mm256_broadcast_ss(filter.data()
+                + fx * filter_size + fy);
+
+
+            for (auto i = 0; i < BI; i++)
+            for (auto j = 0; j < BJ; j++) {
+                auto const tid = (x + i + fx) * cols + y + j + fy;
+                // auto di = din[tid];
+                __m256 di = __mm256_loadu_ps(din.data()
+                    + (x + fx + i) * cols
+                    + y + fy + j * 8);
+                sum[i * BJ + j] = __mm256_fmadd_ps(fi, di, sum[i * BJ + j]);
+            }
+        }
+
+        for (auto i = 0; i < BI; i++)
+            for (auto j = 0; j < BJ; j++) {
+                // FIXME
+                // if (s < 0) s = 0;
+                // if (s > 255) s = 255;
+
+                __mm256_storeu_ps(
+                    dout.data + (x + i) * cols + y + j * 8,
+                    sum[i * BJ + j]
+                );
+            }
+    }
+}
+
+} // namespace loop_tiling
+
+
 namespace meta_tuning
 {
 

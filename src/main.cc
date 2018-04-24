@@ -26,7 +26,8 @@ auto constexpr BI = 2;
 auto constexpr BJ = 16;
 
 using value_type = int;
-using loop_tiling::convolve;
+using vectorization::convolve;
+// using loop_tiling::convolve;
 // using meta_tuning::convolve;
 
 std::array<std::array<value_type, 5>, 5> constexpr kernel{
@@ -37,13 +38,13 @@ std::array<std::array<value_type, 5>, 5> constexpr kernel{
     std::array<value_type, 5>{ 2,  0, -1,  0, -3},
 };
 
-// std::array<value_type, 5 * 5> constexpr kernel{
-//     -3,  0, -1,  0,  2,
-//      0, -1,  0,  2,  0,
-//     -1,  0,  4,  0, -1,
-//      0,  2,  0, -1,  0,
-//      2,  0, -1,  0, -3
-// };
+std::array<value_type, 5 * 5> constexpr kernel_avx{
+    -3,  0, -1,  0,  2,
+     0, -1,  0,  2,  0,
+    -1,  0,  4,  0, -1,
+     0,  2,  0, -1,  0,
+     2,  0, -1,  0, -3
+};
 
 int size;
 
