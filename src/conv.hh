@@ -281,8 +281,8 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
                 auto const tid = (x + i + fx) * cols + y + j + fy;
 
                 // _MM_HINT_T0, _MM_HINT_T1, _MM_HINT_T2, _MM_HINT_NTA
-                _mm_prefetch((const char*)(din[tid + 5].next), _MM_HINT_T1);
-                _mm_prefetch((const char*)(din[tid + 2].next), _MM_HINT_T1);
+                // _mm_prefetch((const char*)(din[tid + 5]), _MM_HINT_T1);
+                // _mm_prefetch((const char*)(din[tid + 2]), _MM_HINT_T1);
 
                 auto di = din[tid];
                 sum[i * BJ + j] += fi * di;
@@ -305,6 +305,8 @@ namespace thread
 {
 
 template <
+    int BI,
+    int BJ,
     class T,
     class Vec,
     std::size_t N
@@ -320,9 +322,9 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
     for (auto y = out_cols; y < cols; y++)
         dout[x * cols + y] = 0;
 
-    std::vector<std::thread> threads;
     if (size < 0)
         size = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads;
 
     for (auto i = 0; i < size; i++)
         threads.emplace_back([&](int rank) {
@@ -401,6 +403,8 @@ namespace opt
 {
 
 template <
+    int BI,
+    int BJ,
     class T,
     class Vec,
     std::size_t N

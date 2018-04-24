@@ -1,4 +1,4 @@
-// ml:run = time -p $bin ../data/0.jpg
+// ml:run = time -p $bin ../data/2.jpg
 // ml:ccf += -fopenmp
 // ml:ldf += -fopenmp -lOpenCL -I/usr/include/opencv -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_aruco -lopencv_bgsegm -lopencv_bioinspired -lopencv_ccalib -lopencv_dnn_objdetect -lopencv_dpm -lopencv_face -lopencv_photo -lopencv_freetype -lopencv_fuzzy -lopencv_hdf -lopencv_hfs -lopencv_img_hash -lopencv_line_descriptor -lopencv_optflow -lopencv_reg -lopencv_rgbd -lopencv_saliency -lopencv_stereo -lopencv_structured_light -lopencv_phase_unwrapping -lopencv_surface_matching -lopencv_tracking -lopencv_datasets -lopencv_text -lopencv_dnn -lopencv_plot -lopencv_xfeatures2d -lopencv_shape -lopencv_video -lopencv_ml -lopencv_ximgproc -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_flann -lopencv_xobjdetect -lopencv_imgcodecs -lopencv_objdetect -lopencv_xphoto -lopencv_imgproc -lopencv_core
 
@@ -15,8 +15,8 @@
 #include "timer.hh"
 #include "conv.hh"
 
-#define OPEN_IMAGE 0
-#define AVX 1
+#define OPEN_IMAGE 1
+#define AVX 0
 
 auto constexpr COLOR_RST = "\e[0m";
 auto constexpr COLOR_ATR = "\e[36m";
@@ -31,8 +31,11 @@ using value_type = int;
 #if AVX
 using vectorization::convolve;
 #else
-using loop_tiling::convolve;
-// using meta_tuning::convolve;
+using meta_tuning::convolve;
+// using loop_tiling::convolve;
+// using thread::convolve;
+// using omp::convolve;
+// using opt::convolve;
 #endif
 
 
@@ -80,7 +83,8 @@ int main(int argc, char* argv[])
     // std::cout << "image size: " << rows << " * " << cols << "\n";
 
     #if OPEN_IMAGE
-    cv::namedWindow("Input", cv::WINDOW_AUTOSIZE);
+    cv::namedWindow("Input", cv::WINDOW_NORMAL);
+    cv::setWindowProperty("Input", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
     cv::imshow("Input", src);
     while (cv::waitKey(1000) != 27 /* esc */) {
     }
@@ -164,7 +168,8 @@ int main(int argc, char* argv[])
 
 
     #if OPEN_IMAGE
-    cv::namedWindow("Output", cv::WINDOW_AUTOSIZE);
+    cv::namedWindow("Output", cv::WINDOW_NORMAL);
+    cv::setWindowProperty("Output", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
     cv::imshow("Output", dst);
     while (cv::waitKey(1000) != 27 /* esc */) {
     }
