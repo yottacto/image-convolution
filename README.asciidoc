@@ -42,6 +42,10 @@ different optimizations, all available namespaces are listed below:
 * `meta_tuning`
 * `loop_tiling`
 
+== Presentation
+
+to use presentation, simplely `make install` and then `make`.
+
 == Methods
 
 === Naive implementation
