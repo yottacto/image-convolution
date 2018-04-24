@@ -69,7 +69,7 @@ using c++ template meta-programming techiques to tuning.
 |====
 
 
-== Simple unroll
+== Loop tiling
 
 `BI` means block height, `BJ` means block width.
 
