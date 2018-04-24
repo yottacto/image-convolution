@@ -62,12 +62,11 @@ using c++ template meta-programming techiques to tuning.
 [cols="^.^1, ^.^1, ^.^1, ^.^1", options="header"]
 |====
 
-| machine / used thread(s) | pic0 (ms) | pic1 (ms) | pic2 (ms)
-|      PC / (4, 6, 6)      |  13.0327  |  55.5592  |  390.986
-|  KNL / (120, 230, 120)   | 0.853256  |  2.75459  |  15.5672
+|    machine / used thread(s)    | pic0 (ms) | pic1 (ms) | pic2 (ms)
+|    PC / (4, 6, 6), <2, 16>     |  13.0327  |  55.5592  |  390.986
+| KNL / (120, 230, 120), <2, 16> | 0.853256  |  2.75459  |  12.4232
 
 |====
-
 
 == Loop tiling
 
@@ -82,6 +81,19 @@ using c++ template meta-programming techiques to tuning.
 |         KNL / 120, <8, 8>          | 0.263038  | 0.563002  |  3.91969
 |        KNL / 140, <16, 16>         |     \     |     \     |  2.87048
 |        KNL / 140, <16, 32>         |     \     |     \     |  2.80441
+|   KNL / (120, 120, 180), <4, 64>   | 0.167442  |  0.36659  |  1.68509
+
+|====
+
+== AVX-512 vectorization
+
+using Intel AVX-512 to do some explicit vectorization.
+
+[cols="^.^1, ^.^1, ^.^1, ^.^1", options="header"]
+|====
+
+| machine / used thread(s), <BI, BJ> | pic0 (ms) | pic1 (ms) | pic2 (ms)
+|   KNL / (120, 130, 180), <4, 4>    | 0.155461  |  0.321393  |  1.44656
 
 |====
 
