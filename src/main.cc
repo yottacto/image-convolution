@@ -16,6 +16,7 @@
 #include "conv.hh"
 
 #define OPEN_IMAGE 0
+#define AVX 1
 
 auto constexpr COLOR_RST = "\e[0m";
 auto constexpr COLOR_ATR = "\e[36m";
@@ -26,10 +27,24 @@ auto constexpr BI = 2;
 auto constexpr BJ = 16;
 
 using value_type = int;
-using vectorization::convolve;
-// using loop_tiling::convolve;
-// using meta_tuning::convolve;
 
+#if AVX
+using vectorization::convolve;
+#else
+using loop_tiling::convolve;
+// using meta_tuning::convolve;
+#endif
+
+
+#if AVX
+std::array<value_type, 5 * 5> constexpr kernel{
+    -3,  0, -1,  0,  2,
+     0, -1,  0,  2,  0,
+    -1,  0,  4,  0, -1,
+     0,  2,  0, -1,  0,
+     2,  0, -1,  0, -3
+};
+#else
 std::array<std::array<value_type, 5>, 5> constexpr kernel{
     std::array<value_type, 5>{-3,  0, -1,  0,  2},
     std::array<value_type, 5>{ 0, -1,  0,  2,  0},
@@ -37,14 +52,7 @@ std::array<std::array<value_type, 5>, 5> constexpr kernel{
     std::array<value_type, 5>{ 0,  2,  0, -1,  0},
     std::array<value_type, 5>{ 2,  0, -1,  0, -3},
 };
-
-std::array<value_type, 5 * 5> constexpr kernel_avx{
-    -3,  0, -1,  0,  2,
-     0, -1,  0,  2,  0,
-    -1,  0,  4,  0, -1,
-     0,  2,  0, -1,  0,
-     2,  0, -1,  0, -3
-};
+#endif
 
 int size;
 

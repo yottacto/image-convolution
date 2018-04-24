@@ -11,6 +11,31 @@
 namespace vectorization
 {
 
+namespace detail
+{
+
+template <typename T>
+constexpr T sqrt_helper(T x, T lo, T hi)
+{
+    if (lo == hi)
+        return lo;
+
+    const T mid = (lo + hi + 1) / 2;
+
+    if (x / mid < mid)
+        return sqrt_helper<T>(x, lo, mid - 1);
+    else
+        return sqrt_helper(x, mid, hi);
+}
+
+template <typename T>
+constexpr T ct_sqrt(T x)
+{
+    return sqrt_helper<T>(x, 0, x / 2 + 1);
+}
+
+} // namespace detail
+
 template <
     int BI,
     int BJ,
@@ -19,10 +44,10 @@ template <
     std::size_t N
 >
 void convolve(int rows, int cols, Vec const& din, Vec& dout,
-    std::array<std::array<T, N>, N> const& filter, int size)
+    std::array<T, N> const& filter, int size)
 {
     using value_type = typename Vec::value_type;
-    int constexpr filter_size = N;
+    int constexpr filter_size = detail::ct_sqrt(N);
     auto out_rows = rows - filter_size + 1;
     auto out_cols = cols - filter_size + 1;
     for (auto x = out_rows; x < rows; x++)
@@ -48,8 +73,6 @@ void convolve(int rows, int cols, Vec const& din, Vec& dout,
 
             for (auto i = 0; i < BI; i++)
             for (auto j = 0; j < BJ; j++) {
-                auto const tid = (x + i + fx) * cols + y + j + fy;
-                // auto di = din[tid];
                 __m256 di = __mm256_loadu_ps(din.data()
                     + (x + fx + i) * cols
                     + y + fy + j * 8);
