@@ -4,6 +4,44 @@
 
 Optimize image convolution on CPU, especially for Intel Knights Landing.
 
+== Usage
+
+in link:src/[src/], to build:
+
+    make
+
+to clean up:
+
+    make clean
+
+to clean up and rebulid:
+
+    make rebuild
+
+to run a sample test:
+
+    make test
+
+or you can run like:
+
+    ./build/build <pic> [G]
+
+here `G` indicates the image is passed in gray scale.
+
+link:src/filter.cc[filter.cc] using the built-in filter2d to filter a image.
+
+in our link:src/main.cc[main.cc], you can mannully change some macros' value, e.g. `DISPLAY_IMAGE`, `AVX`,
+where `AVX` indicates to use AVX-521 instructions to do some vectorization.
+
+And you can using the `convolve` function inside different namespaces to try out
+different optimizations, all available namespaces are listed below:
+
+* `basic`
+* `omp`
+* `thread`
+* `meta_tuning`
+* `loop_tiling`
+
 == Methods
 
 === Naive implementation
