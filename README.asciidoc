@@ -48,6 +48,9 @@ to use presentation, simplely `make install` and then `make`.
 
 == Methods
 
+You can find all these methods in link:src/conv.hh[conv.hh], except the built-in filter2d.
+Different methods are in different namespace.
+
 === Naive implementation
 
 === OpenCV built-in `filter2d`
